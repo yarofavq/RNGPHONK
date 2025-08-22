@@ -14,12 +14,12 @@ local function requestKey()
     screenGui.Parent = PlayerGui
 
     local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 520, 0, 160)
-    frame.Position = UDim2.new(0.5, -260, 0.5, -80)
+    frame.Size = UDim2.new(0, 520, 0, 200)
+    frame.Position = UDim2.new(0.5, -260, 0.5, -100)
     frame.BackgroundColor3 = Color3.fromRGB(30,30,30)
     frame.BorderSizePixel = 0
     frame.Parent = screenGui
-    local uic = Instance.new("UICorner", frame)
+    Instance.new("UICorner", frame)
 
     local title = Instance.new("TextLabel", frame)
     title.Size = UDim2.new(1, -20, 0, 40)
@@ -41,9 +41,20 @@ local function requestKey()
     info.TextSize = 14
     info.Text = "Get key at:\n" .. keyLink .. "\nPassword for archive: Ztag.inf"
 
+    -- Кнопка для копирования ссылки
+    local copyLinkButton = Instance.new("TextButton", frame)
+    copyLinkButton.Size = UDim2.new(0, 120, 0, 30)
+    copyLinkButton.Position = UDim2.new(0, 10, 0, 108)
+    copyLinkButton.Text = "Copy Key Link"
+    copyLinkButton.Font = Enum.Font.Gotham
+    copyLinkButton.TextSize = 14
+    copyLinkButton.TextColor3 = Color3.new(1,1,1)
+    copyLinkButton.BackgroundColor3 = Color3.fromRGB(70,130,180)
+    Instance.new("UICorner", copyLinkButton)
+
     local inputBox = Instance.new("TextBox", frame)
-    inputBox.Size = UDim2.new(1, -120, 0, 32)
-    inputBox.Position = UDim2.new(0, 10, 0, 108)
+    inputBox.Size = UDim2.new(1, -140, 0, 32)
+    inputBox.Position = UDim2.new(0, 140, 0, 108)
     inputBox.PlaceholderText = "Enter key here"
     inputBox.ClearTextOnFocus = false
     inputBox.Text = ""
@@ -64,8 +75,8 @@ local function requestKey()
     Instance.new("UICorner", submit)
 
     local status = Instance.new("TextLabel", frame)
-    status.Size = UDim2.new(1, -20, 0, 14)
-    status.Position = UDim2.new(0, 10, 0, 144)
+    status.Size = UDim2.new(1, -20, 0, 20)
+    status.Position = UDim2.new(0, 10, 0, 150)
     status.BackgroundTransparency = 1
     status.TextColor3 = Color3.fromRGB(200,200,200)
     status.Font = Enum.Font.Gotham
@@ -86,11 +97,15 @@ local function requestKey()
         end
     end
 
+    copyLinkButton.MouseButton1Click:Connect(function()
+        setclipboard(keyLink)
+        status.Text = "Key link copied to clipboard!"
+    end)
+
     submit.MouseButton1Click:Connect(function()
         checkKey(inputBox.Text)
     end)
 
-    -- also allow Enter key
     inputBox.FocusLost:Connect(function(enterPressed)
         if enterPressed then
             checkKey(inputBox.Text)
@@ -100,7 +115,6 @@ local function requestKey()
     repeat task.wait() until keyAccepted
 end
 
--- Request key before continuing
 requestKey()
 
 -- Load Rayfield
@@ -116,7 +130,6 @@ local StarterGui = game:GetService("StarterGui")
 local EquippedAura = LocalPlayer:WaitForChild("Equipped"):WaitForChild("Aura")
 local Rolled = LocalPlayer:WaitForChild("Rolled")
 
--- Aura Sound folder & sound
 local AuraSoundFolder = LocalPlayer:FindFirstChild("AuraSound") or Instance.new("Folder", LocalPlayer)
 AuraSoundFolder.Name = "AuraSound"
 local AuraSound = AuraSoundFolder:FindFirstChild("AuraSound") or Instance.new("Sound", AuraSoundFolder)
@@ -124,13 +137,11 @@ AuraSound.Name = "AuraSound"
 AuraSound.Looped = true
 AuraSound.Volume = 0.5
 
--- Variables
 local AuraToggles = {}
 local CurrentAura = nil
 local LastCopiedAura = "None"
 local AutoRollEnabled = false
 
--- Create window
 local Window = Rayfield:CreateWindow({
     Name = "🎵 Phonk RNG Script",
     LoadingTitle = "Phonk RNG Hub",
@@ -155,13 +166,11 @@ local function ResetAuras()
 end
 
 local function RebuildAuraList()
-    -- destroy old toggles
     for _, toggle in pairs(AuraToggles) do
         if toggle and toggle.Destroy then toggle:Destroy() end
     end
     AuraToggles = {}
 
-    -- collect numeric first then strings
     local numericAuras, stringAuras = {}, {}
     for _, item in ipairs(Rolled:GetChildren()) do
         local name = item.Name
@@ -171,7 +180,6 @@ local function RebuildAuraList()
             table.insert(stringAuras, name)
         end
     end
-
     table.sort(numericAuras)
     table.sort(stringAuras)
 
@@ -239,12 +247,10 @@ TabCopy:CreateInput({
     end
 })
 
--- Give proximity prompts to all players (press to copy aura)
 TabCopy:CreateButton({Name="Enable Proximity Aura", Callback=function()
     for _, player in ipairs(Players:GetPlayers()) do
         if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
             local hrp = player.Character.HumanoidRootPart
-            -- create temporary prompt
             local prompt = Instance.new("ProximityPrompt")
             prompt.Name = "PhonkCopyPrompt"
             prompt.ActionText = "Hold to Copy Aura"
@@ -268,7 +274,7 @@ TabCopy:CreateButton({Name="Enable Proximity Aura", Callback=function()
                 end
             end)
 
-            game:GetService("Debris"):AddItem(prompt, 6) -- prompt exists for 6 seconds
+            game:GetService("Debris"):AddItem(prompt, 6)
         end
     end
 end})
@@ -318,10 +324,12 @@ TabTools:CreateButton({Name="Load Infinite Yield", Callback=function()
     end)
     Rayfield:Notify({Title="Loaded", Content="Infinite Yield executed.", Duration=2})
 end})
+
 TabTools:CreateButton({Name="Copy Place ID", Callback=function()
     setclipboard(tostring(game.PlaceId))
     Rayfield:Notify({Title="Copied", Content="Place ID copied.", Duration=2})
 end})
+
 TabTools:CreateButton({Name="Copy Your User ID", Callback=function()
     setclipboard(tostring(LocalPlayer.UserId))
     Rayfield:Notify({Title="Copied", Content="User ID copied.", Duration=2})
