@@ -1,4 +1,57 @@
 -- Phonk RNG Script using Rayfield UI by yarofav
+-- Key System
+local correctKey = "Ztag.inf"
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Create key input GUI
+local function requestKey()
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "KeyPromptGui"
+    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+    local Frame = Instance.new("Frame")
+    Frame.Size = UDim2.new(0, 400, 0, 150)
+    Frame.Position = UDim2.new(0.5, -200, 0.5, -75)
+    Frame.BackgroundColor3 = Color3.fromRGB(30,30,30)
+    Frame.Parent = ScreenGui
+
+    local TextLabel = Instance.new("TextLabel")
+    TextLabel.Size = UDim2.new(1, -20, 0, 50)
+    TextLabel.Position = UDim2.new(0, 10, 0, 10)
+    TextLabel.Text = "Enter Key to Use Script.\nGet key here: https://direct-link.net/1386295/x18O4Rt56sgl"
+    TextLabel.TextColor3 = Color3.fromRGB(255,255,255)
+    TextLabel.TextWrapped = true
+    TextLabel.BackgroundTransparency = 1
+    TextLabel.Parent = Frame
+
+    local TextBox = Instance.new("TextBox")
+    TextBox.Size = UDim2.new(1, -20, 0, 50)
+    TextBox.Position = UDim2.new(0, 10, 0, 70)
+    TextBox.PlaceholderText = "Enter Key Here"
+    TextBox.TextColor3 = Color3.fromRGB(255,255,255)
+    TextBox.BackgroundColor3 = Color3.fromRGB(50,50,50)
+    TextBox.Parent = Frame
+
+    local keyEntered = false
+
+    TextBox.FocusLost:Connect(function(enterPressed)
+        if enterPressed then
+            if TextBox.Text == correctKey then
+                ScreenGui:Destroy()
+                keyEntered = true
+                print("Correct Key! Loading script...")
+            else
+                TextLabel.Text = "Incorrect Key! Get key here: https://direct-link.net/1386295/x18O4Rt56sgl"
+                TextBox.Text = ""
+            end
+        end
+    end)
+
+    repeat task.wait() until keyEntered
+end
+
+requestKey()
 
 -- Load Rayfield
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield', true))()
@@ -6,10 +59,7 @@ if not Rayfield then
     Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source', true))()
 end
 
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
 local StarterGui = game:GetService("StarterGui")
-
 local EquippedAura = LocalPlayer:WaitForChild("Equipped"):WaitForChild("Aura")
 local Rolled = LocalPlayer:WaitForChild("Rolled")
 
@@ -132,17 +182,17 @@ TabCopy:CreateInput({
     end
 })
 
--- Game Tab Functions
-TabGame:CreateButton({Name="Телепорт к Charm 1", Callback=function()
+-- Game Tab
+TabGame:CreateButton({Name="Teleport to Charm 1", Callback=function()
     local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
     char:SetPrimaryPartCFrame(CFrame.new(93.9420929,206.313431,-362.343933,1,0,0,0,1,0,0,0,1))
-    Rayfield:Notify({Title="Teleported", Content="Телепорт к Charm 1", Duration=2})
+    Rayfield:Notify({Title="Teleported", Content="Teleported to Charm 1", Duration=2})
 end})
 
-TabGame:CreateButton({Name="Телепорт к Charm 2", Callback=function()
+TabGame:CreateButton({Name="Teleport to Charm 2", Callback=function()
     local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
     char:SetPrimaryPartCFrame(CFrame.new(-191.257889,206.213348,-352.611938,1,0,0,0,1,0,0,0,1))
-    Rayfield:Notify({Title="Teleported", Content="Телепорт к Charm 2", Duration=2})
+    Rayfield:Notify({Title="Teleported", Content="Teleported to Charm 2", Duration=2})
 end})
 
 TabGame:CreateToggle({Name="Auto Roll", CurrentValue=false, Callback=function(state)
@@ -151,7 +201,7 @@ TabGame:CreateToggle({Name="Auto Roll", CurrentValue=false, Callback=function(st
     spawn(function()
         while AutoRollEnabled do
             local args={true}
-            game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Rolling"):WaitForChild("Rolling"):FireServer(unpack(args))
+            LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Rolling"):WaitForChild("Rolling"):FireServer(unpack(args))
             task.wait(0.1)
         end
     end)
