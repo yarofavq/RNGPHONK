@@ -29,6 +29,7 @@ local Window = Rayfield:CreateWindow({
 
 -- Tabs
 local TabAuras = Window:CreateTab("Auras", 4483362458)
+local TabGame = Window:CreateTab("Game", 4483362458)
 local TabTools = Window:CreateTab("Tools", 4483362458)
 local TabFun = Window:CreateTab("Fun", 4483362458)
 local TabCopy = Window:CreateTab("Copy Aura", 4483362458)
@@ -36,8 +37,9 @@ local TabMusic = Window:CreateTab("Aura Music", 4483362458)
 
 -- Variables
 local AuraToggles = {}
-local CurrentAura = EquippedAura.Value or nil
+local CurrentAura = nil
 local LastCopiedAura = "None"
+local AutoRollEnabled = false
 
 -- Reset Auras
 local function ResetAuras()
@@ -47,7 +49,7 @@ local function ResetAuras()
     CurrentAura = nil
 end
 
--- Build Aura List (numeric first, then alphabet)
+-- Build Aura List (numeric first, then alphabetically)
 local function RebuildAuraList()
     for _, toggle in pairs(AuraToggles) do
         if toggle and toggle.Destroy then toggle:Destroy() end
@@ -67,9 +69,11 @@ local function RebuildAuraList()
     table.sort(numericAuras)
     table.sort(stringAuras)
 
-    for _, name in ipairs(numericAuras) do table.insert(stringAuras, 1, name) end
+    local sortedAuras = {}
+    for _, v in ipairs(numericAuras) do table.insert(sortedAuras, v) end
+    for _, v in ipairs(stringAuras) do table.insert(sortedAuras, v) end
 
-    for _, name in ipairs(stringAuras) do
+    for _, name in ipairs(sortedAuras) do
         local Toggle = TabAuras:CreateToggle({
             Name = name,
             CurrentValue = (EquippedAura.Value == name),
@@ -129,7 +133,33 @@ TabCopy:CreateInput({
     end
 })
 
--- Tools
+-- Game Tab Functions
+local function TeleportToCFrame(cframe)
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        LocalPlayer.Character.HumanoidRootPart.CFrame = cframe
+    end
+end
+
+TabGame:CreateButton({Name = "Teleport to Charm 1", Callback = function()
+    TeleportToCFrame(CFrame.new(93.9420929, 206.313431, -362.343933, 1,0,0,0,1,0,0,0,1))
+end})
+
+TabGame:CreateButton({Name = "Teleport to Charm 2", Callback = function()
+    TeleportToCFrame(CFrame.new(-191.257889, 206.213348, -352.611938, 1,0,0,0,1,0,0,0,1))
+end})
+
+TabGame:CreateToggle({Name = "Auto Roll", CurrentValue = false, Callback = function(state)
+    AutoRollEnabled = state
+    spawn(function()
+        while AutoRollEnabled do
+            local args = {true}
+            game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Rolling"):WaitForChild("Rolling"):FireServer(unpack(args))
+            task.wait(0.1)
+        end
+    end)
+end})
+
+-- Tools Tab
 TabTools:CreateButton({Name = "Load Infinite Yield", Callback = function()
     loadstring(game:HttpGet('https://raw.githubusercontent.com/DarkNetworks/Infinite-Yield/main/latest.lua'))()
     Rayfield:Notify({Title = "Loaded", Content = "Infinite Yield executed.", Duration = 2})
@@ -145,7 +175,7 @@ TabTools:CreateButton({Name = "Copy Your User ID", Callback = function()
     Rayfield:Notify({Title = "Copied", Content = "User ID copied.", Duration = 2})
 end})
 
--- Fun
+-- Fun Tab
 TabFun:CreateToggle({Name = "Rainbow Body", CurrentValue = false, Callback = function(state)
     spawn(function()
         while state do
@@ -153,7 +183,7 @@ TabFun:CreateToggle({Name = "Rainbow Body", CurrentValue = false, Callback = fun
             if char then
                 for _, part in ipairs(char:GetDescendants()) do
                     if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-                        part.Color = Color3.fromHSV(tick()%5/5,1,1)
+                        part.Color = Color3.fromHSV(tick() % 5 / 5, 1, 1)
                     end
                 end
             end
