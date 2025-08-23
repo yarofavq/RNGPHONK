@@ -1,5 +1,5 @@
 -- Phonk RNG Script using Rayfield UI by yarofav
--- Key check (link + password)
+-- Enhanced key system with modern UI
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -7,107 +7,382 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local correctKey = "Ztag.inf"
 local keyLink = "https://direct-link.net/1386295/x18O4Rt56sgl"
 
--- Fullscreen background для проверки ключа
+-- Modern key verification UI
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "PhonkKeyGui"
 screenGui.ResetOnSpawn = false
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 screenGui.Parent = PlayerGui
 
-local bg = Instance.new("ImageLabel")
-bg.Size = UDim2.new(1,0,1,0)
-bg.Position = UDim2.new(0,0,0,0)
-bg.BackgroundTransparency = 1
-bg.Image = "rbxassetid://104976846876989" -- фон проверки
+-- Fullscreen blur effect
+local blur = Instance.new("BlurEffect")
+blur.Size = 20
+blur.Parent = game:GetService("Lighting")
+
+-- Background gradient
+local bg = Instance.new("Frame")
+bg.Size = UDim2.new(1, 0, 1, 0)
+bg.Position = UDim2.new(0, 0, 0, 0)
+bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+bg.BackgroundTransparency = 0.2
+bg.ZIndex = 0
 bg.Parent = screenGui
 
--- Frame интерфейса
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 520, 0, 200)
-frame.Position = UDim2.new(0.5, -260, 0.5, -100)
-frame.BackgroundColor3 = Color3.fromRGB(30,30,30)
-frame.BorderSizePixel = 0
-frame.Parent = screenGui
-Instance.new("UICorner", frame)
+local gradient = Instance.new("UIGradient")
+gradient.Rotation = 45
+gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 20, 40)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(40, 15, 60)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(25, 25, 50))
+}
+gradient.Transparency = NumberSequence.new(0.5)
+gradient.Parent = bg
 
-local title = Instance.new("TextLabel", frame)
-title.Size = UDim2.new(1, -20, 0, 40)
-title.Position = UDim2.new(0, 10, 0, 10)
+-- Animated particles background
+local particles = Instance.new("Frame")
+particles.Size = UDim2.new(1, 0, 1, 0)
+particles.Position = UDim2.new(0, 0, 0, 0)
+particles.BackgroundTransparency = 1
+particles.ZIndex = 1
+particles.Parent = screenGui
+
+-- Create floating particles
+for i = 1, 15 do
+    local particle = Instance.new("Frame")
+    particle.Size = UDim2.new(0, 4, 0, 4)
+    particle.Position = UDim2.new(0, math.random(0, 1000), 0, math.random(0, 600))
+    particle.BackgroundColor3 = Color3.fromRGB(100, 100, 255)
+    particle.BorderSizePixel = 0
+    particle.ZIndex = 1
+    particle.Parent = particles
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(1, 0)
+    corner.Parent = particle
+    
+    -- Animate particles
+    spawn(function()
+        while particle and particle.Parent do
+            for i = 0, 1, 0.01 do
+                if not particle then break end
+                particle.Position = particle.Position + UDim2.new(0, math.sin(tick() + i) * 0.5, 0, math.cos(tick() + i) * 0.5)
+                particle.BackgroundTransparency = 0.5 + math.sin(tick() + i) * 0.3
+                task.wait(0.05)
+            end
+        end
+    end)
+end
+
+-- Modern container
+local container = Instance.new("Frame")
+container.Size = UDim2.new(0, 500, 0, 350)
+container.Position = UDim2.new(0.5, -250, 0.5, -175)
+container.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+container.BorderSizePixel = 0
+container.ZIndex = 2
+container.Parent = screenGui
+
+-- Make container non-draggable by preventing mouse events from propagating
+container.Active = true
+container.Selectable = false
+
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim.new(0, 15)
+uiCorner.Parent = container
+
+-- Glow effect
+local glow = Instance.new("ImageLabel")
+glow.Image = "rbxassetid://5028851472"
+glow.ScaleType = Enum.ScaleType.Slice
+glow.SliceCenter = Rect.new(24, 24, 276, 276)
+glow.ImageColor3 = Color3.fromRGB(70, 50, 150)
+glow.ImageTransparency = 0.8
+glow.Size = UDim2.new(1, 40, 1, 40)
+glow.Position = UDim2.new(0, -20, 0, -20)
+glow.BackgroundTransparency = 1
+glow.ZIndex = 1
+glow.Parent = container
+
+-- Header with gradient
+local header = Instance.new("Frame")
+header.Size = UDim2.new(1, 0, 0, 60)
+header.Position = UDim2.new(0, 0, 0, 0)
+header.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+header.BorderSizePixel = 0
+header.ZIndex = 3
+header.Parent = container
+
+local headerCorner = Instance.new("UICorner")
+headerCorner.CornerRadius = UDim.new(0, 15)
+headerCorner.Parent = header
+
+local headerGradient = Instance.new("UIGradient")
+headerGradient.Rotation = 90
+headerGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(70, 30, 130)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(40, 20, 90))
+}
+headerGradient.Parent = header
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -20, 1, 0)
+title.Position = UDim2.new(0, 20, 0, 0)
 title.BackgroundTransparency = 1
-title.TextColor3 = Color3.new(1,1,1)
-title.Font = Enum.Font.GothamBold
-title.TextSize = 20
-title.Text = "Enter Key to Use Script"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.GothamBlack
+title.TextSize = 22
+title.Text = "🎵 PHONK RNG AUTHENTICATION"
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.ZIndex = 4
+title.Parent = header
 
--- TextBox для ключа
-local inputBox = Instance.new("TextBox", frame)
-inputBox.Size = UDim2.new(1, -140, 0, 32)
-inputBox.Position = UDim2.new(0, 140, 0, 108)
-inputBox.PlaceholderText = "Enter key here"
+local subtitle = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -20, 0, 20)
+title.Position = UDim2.new(0, 20, 0, 35)
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.fromRGB(200, 200, 220)
+title.Font = Enum.Font.Gotham
+title.TextSize = 12
+title.Text = "Enter your key to unlock the ultimate Phonk experience"
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.ZIndex = 4
+title.Parent = header
+
+-- Content
+local instructions = Instance.new("TextLabel")
+instructions.Size = UDim2.new(1, -40, 0, 60)
+instructions.Position = UDim2.new(0, 20, 0, 70)
+instructions.BackgroundTransparency = 1
+instructions.TextColor3 = Color3.fromRGB(200, 200, 220)
+instructions.Font = Enum.Font.Gotham
+instructions.TextSize = 14
+instructions.TextWrapped = true
+instructions.Text = "Get your access key from the link below. The key is required to use the Phonk RNG script features."
+instructions.TextXAlignment = Enum.TextXAlignment.Left
+instructions.ZIndex = 3
+instructions.Parent = container
+
+-- Key input
+local inputContainer = Instance.new("Frame")
+inputContainer.Size = UDim2.new(1, -40, 0, 50)
+inputContainer.Position = UDim2.new(0, 20, 0, 140)
+inputContainer.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+inputContainer.BorderSizePixel = 0
+inputContainer.ZIndex = 3
+inputContainer.Parent = container
+
+local inputCorner = Instance.new("UICorner")
+inputCorner.CornerRadius = UDim.new(0, 10)
+inputCorner.Parent = inputContainer
+
+local inputBox = Instance.new("TextBox")
+inputBox.Size = UDim2.new(1, -20, 1, 0)
+inputBox.Position = UDim2.new(0, 10, 0, 0)
+inputBox.PlaceholderText = "Enter your access key here..."
 inputBox.ClearTextOnFocus = false
 inputBox.Text = ""
 inputBox.Font = Enum.Font.Gotham
-inputBox.TextSize = 18
-inputBox.TextColor3 = Color3.new(1,1,1)
-inputBox.BackgroundColor3 = Color3.fromRGB(45,45,45)
-Instance.new("UICorner", inputBox)
+inputBox.TextSize = 16
+inputBox.TextColor3 = Color3.new(1, 1, 1)
+inputBox.BackgroundTransparency = 1
+inputBox.ZIndex = 4
+inputBox.Parent = inputContainer
 
--- Кнопка Submit
-local submit = Instance.new("TextButton", frame)
-submit.Size = UDim2.new(0, 90, 0, 32)
-submit.Position = UDim2.new(1, -100, 0, 108)
-submit.Text = "Submit"
-submit.Font = Enum.Font.GothamBold
-submit.TextSize = 18
-submit.TextColor3 = Color3.new(1,1,1)
-submit.BackgroundColor3 = Color3.fromRGB(70,130,180)
-Instance.new("UICorner", submit)
-
--- Кнопка копирования ссылки
-local copyLinkButton = Instance.new("TextButton", frame)
-copyLinkButton.Size = UDim2.new(0, 120, 0, 30)
-copyLinkButton.Position = UDim2.new(0, 10, 0, 108)
-copyLinkButton.Text = "Copy Key Link"
-copyLinkButton.Font = Enum.Font.Gotham
-copyLinkButton.TextSize = 14
-copyLinkButton.TextColor3 = Color3.new(1,1,1)
-copyLinkButton.BackgroundColor3 = Color3.fromRGB(70,130,180)
-Instance.new("UICorner", copyLinkButton)
-copyLinkButton.MouseButton1Click:Connect(function()
-    setclipboard(keyLink)
+inputBox.Focused:Connect(function()
+    inputContainer.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
 end)
 
--- Статус и прогресс
-local status = Instance.new("TextLabel", frame)
-status.Size = UDim2.new(1, -20, 0, 20)
-status.Position = UDim2.new(0, 10, 0, 150)
+inputBox.FocusLost:Connect(function()
+    inputContainer.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+end)
+
+-- Buttons container
+local buttonsContainer = Instance.new("Frame")
+buttonsContainer.Size = UDim2.new(1, -40, 0, 40)
+buttonsContainer.Position = UDim2.new(0, 20, 0, 200)
+buttonsContainer.BackgroundTransparency = 1
+buttonsContainer.ZIndex = 3
+buttonsContainer.Parent = container
+
+-- Copy link button
+local copyLinkButton = Instance.new("TextButton")
+copyLinkButton.Size = UDim2.new(0, 180, 1, 0)
+copyLinkButton.Position = UDim2.new(0, 0, 0, 0)
+copyLinkButton.Text = "🌐 Copy Key Link"
+copyLinkButton.Font = Enum.Font.GothamBold
+copyLinkButton.TextSize = 14
+copyLinkButton.TextColor3 = Color3.new(1, 1, 1)
+copyLinkButton.BackgroundColor3 = Color3.fromRGB(70, 50, 150)
+copyLinkButton.AutoButtonColor = false
+copyLinkButton.ZIndex = 4
+copyLinkButton.Parent = buttonsContainer
+
+local copyCorner = Instance.new("UICorner")
+copyCorner.CornerRadius = UDim.new(0, 8)
+copyCorner.Parent = copyLinkButton
+
+-- Hover effect for copy button
+copyLinkButton.MouseEnter:Connect(function()
+    game:GetService("TweenService"):Create(
+        copyLinkButton, 
+        TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        {BackgroundColor3 = Color3.fromRGB(90, 70, 180)}
+    ):Play()
+end)
+
+copyLinkButton.MouseLeave:Connect(function()
+    game:GetService("TweenService"):Create(
+        copyLinkButton, 
+        TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        {BackgroundColor3 = Color3.fromRGB(70, 50, 150)}
+    ):Play()
+end)
+
+-- Submit button
+local submit = Instance.new("TextButton")
+submit.Size = UDim2.new(0, 120, 1, 0)
+submit.Position = UDim2.new(1, -120, 0, 0)
+submit.Text = "✅ Submit"
+submit.Font = Enum.Font.GothamBold
+submit.TextSize = 14
+submit.TextColor3 = Color3.new(1, 1, 1)
+submit.BackgroundColor3 = Color3.fromRGB(60, 180, 100)
+submit.AutoButtonColor = false
+submit.ZIndex = 4
+submit.Parent = buttonsContainer
+
+local submitCorner = Instance.new("UICorner")
+submitCorner.CornerRadius = UDim.new(0, 8)
+submitCorner.Parent = submit
+
+-- Hover effect for submit button
+submit.MouseEnter:Connect(function()
+    game:GetService("TweenService"):Create(
+        submit, 
+        TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        {BackgroundColor3 = Color3.fromRGB(80, 200, 120)}
+    ):Play()
+end)
+
+submit.MouseLeave:Connect(function()
+    game:GetService("TweenService"):Create(
+        submit, 
+        TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        {BackgroundColor3 = Color3.fromRGB(60, 180, 100)}
+    ):Play()
+end)
+
+-- Status
+local status = Instance.new("TextLabel")
+status.Size = UDim2.new(1, -40, 0, 20)
+status.Position = UDim2.new(0, 20, 0, 250)
 status.BackgroundTransparency = 1
-status.TextColor3 = Color3.fromRGB(200,200,200)
+status.TextColor3 = Color3.fromRGB(200, 200, 220)
 status.Font = Enum.Font.Gotham
-status.TextSize = 13
-status.Text = "Enter key and press Submit."
+status.TextSize = 12
+status.Text = "Enter your key and press Submit to continue"
+status.TextXAlignment = Enum.TextXAlignment.Left
+status.ZIndex = 3
+status.Parent = container
 
-local progressBar = Instance.new("Frame", frame)
-progressBar.Size = UDim2.new(0,0,0,10)
-progressBar.Position = UDim2.new(0,10,0,180)
-progressBar.BackgroundColor3 = Color3.fromRGB(70,130,180)
-Instance.new("UICorner", progressBar)
+-- Progress bar background
+local progressBarBg = Instance.new("Frame")
+progressBarBg.Size = UDim2.new(1, -40, 0, 12)
+progressBarBg.Position = UDim2.new(0, 20, 0, 280)
+progressBarBg.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+progressBarBg.BorderSizePixel = 0
+progressBarBg.ZIndex = 3
+progressBarBg.Parent = container
 
--- Проверка ключа
+local progressBgCorner = Instance.new("UICorner")
+progressBgCorner.CornerRadius = UDim.new(0, 6)
+progressBgCorner.Parent = progressBarBg
+
+-- Progress bar
+local progressBar = Instance.new("Frame")
+progressBar.Size = UDim2.new(0, 0, 1, 0)
+progressBar.Position = UDim2.new(0, 0, 0, 0)
+progressBar.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+progressBar.BorderSizePixel = 0
+progressBar.ZIndex = 4
+progressBar.Parent = progressBarBg
+
+local progressCorner = Instance.new("UICorner")
+progressCorner.CornerRadius = UDim.new(0, 6)
+progressCorner.Parent = progressBar
+
+-- Animated progress bar gradient
+local progressGradient = Instance.new("UIGradient")
+progressGradient.Rotation = 90
+progressGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(70, 130, 180)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 160, 230))
+}
+progressGradient.Parent = progressBar
+
+-- Functions
+copyLinkButton.MouseButton1Click:Connect(function()
+    setclipboard(keyLink)
+    local originalText = copyLinkButton.Text
+    copyLinkButton.Text = "📋 Copied to clipboard!"
+    
+    game:GetService("TweenService"):Create(
+        copyLinkButton,
+        TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        {BackgroundColor3 = Color3.fromRGB(100, 80, 200)}
+    ):Play()
+    
+    task.wait(2)
+    
+    copyLinkButton.Text = originalText
+    game:GetService("TweenService"):Create(
+        copyLinkButton,
+        TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        {BackgroundColor3 = Color3.fromRGB(70, 50, 150)}
+    ):Play()
+end)
+
 local keyAccepted = false
 local function checkKey(k)
     if k == correctKey then
         keyAccepted = true
-        -- Анимация прогресса
+        status.Text = "Key accepted! Loading..."
+        
+        -- Smooth progress animation
         for i = 0, 1, 0.01 do
-            progressBar.Size = UDim2.new(i,0,0,10)
+            progressBar.Size = UDim2.new(i, 0, 1, 0)
             status.Text = "Loading... "..math.floor(i*100).."%"
             task.wait(0.02)
         end
+        
+        -- Fade out effect
+        for i = 0, 1, 0.05 do
+            container.BackgroundTransparency = i
+            header.BackgroundTransparency = i
+            inputContainer.BackgroundTransparency = i
+            progressBarBg.BackgroundTransparency = i
+            progressBar.BackgroundTransparency = i
+            glow.ImageTransparency = 0.8 + i * 0.2
+            task.wait(0.03)
+        end
+        
         screenGui:Destroy()
+        blur:Destroy()
         return true
     else
-        status.Text = "Incorrect key."
+        -- Shake animation for wrong key
+        status.Text = "❌ Incorrect key! Please try again."
         inputBox.Text = ""
+        
+        local shakeTime = 0.5
+        local shakeOffset = 5
+        local originalPosition = container.Position
+        
+        for i = 0, shakeTime, 0.05 do
+            container.Position = originalPosition + UDim2.new(0, math.random(-shakeOffset, shakeOffset), 0, math.random(-shakeOffset, shakeOffset))
+            task.wait(0.05)
+        end
+        container.Position = originalPosition
         return false
     end
 end
@@ -122,7 +397,16 @@ inputBox.FocusLost:Connect(function(enterPressed)
     end
 end)
 
+-- Make sure the UI is always centered and not movable
+game:GetService("RunService").RenderStepped:Connect(function()
+    container.Position = UDim2.new(0.5, -250, 0.5, -175)
+end)
+
 repeat task.wait() until keyAccepted
+
+-- ======= Остальная часть скрипта без изменений =======
+-- [Здесь следует остальной код скрипта без изменений]
+-- [Здесь следует остальной код скрипта без изменений]
 
 -- ======= Основной скрипт Phonk RNG после загрузки =======
 local Rayfield = nil
