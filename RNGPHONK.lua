@@ -1,123 +1,130 @@
 -- Phonk RNG Script using Rayfield UI by yarofav
 -- Key check (link + password)
-local correctKey = "Ztag.inf"
-local keyLink = "https://direct-link.net/1386295/x18O4Rt56sgl"
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local correctKey = "Ztag.inf"
+local keyLink = "https://direct-link.net/1386295/x18O4Rt56sgl"
 
-local function requestKey()
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "PhonkKeyGui"
-    screenGui.ResetOnSpawn = false
-    screenGui.Parent = PlayerGui
+-- Fullscreen background для проверки ключа
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "PhonkKeyGui"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = PlayerGui
 
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 520, 0, 200)
-    frame.Position = UDim2.new(0.5, -260, 0.5, -100)
-    frame.BackgroundColor3 = Color3.fromRGB(30,30,30)
-    frame.BorderSizePixel = 0
-    frame.Parent = screenGui
-    Instance.new("UICorner", frame)
+local bg = Instance.new("ImageLabel")
+bg.Size = UDim2.new(1,0,1,0)
+bg.Position = UDim2.new(0,0,0,0)
+bg.BackgroundTransparency = 1
+bg.Image = "rbxassetid://104976846876989" -- фон проверки
+bg.Parent = screenGui
 
-    local title = Instance.new("TextLabel", frame)
-    title.Size = UDim2.new(1, -20, 0, 40)
-    title.Position = UDim2.new(0, 10, 0, 10)
-    title.BackgroundTransparency = 1
-    title.TextColor3 = Color3.new(1,1,1)
-    title.TextScaled = false
-    title.Font = Enum.Font.GothamBold
-    title.TextSize = 20
-    title.Text = "Enter Key to Use Script"
+-- Frame интерфейса
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 520, 0, 200)
+frame.Position = UDim2.new(0.5, -260, 0.5, -100)
+frame.BackgroundColor3 = Color3.fromRGB(30,30,30)
+frame.BorderSizePixel = 0
+frame.Parent = screenGui
+Instance.new("UICorner", frame)
 
-    local info = Instance.new("TextLabel", frame)
-    info.Size = UDim2.new(1, -20, 0, 48)
-    info.Position = UDim2.new(0, 10, 0, 48)
-    info.BackgroundTransparency = 1
-    info.TextColor3 = Color3.new(1,1,1)
-    info.TextWrapped = true
-    info.Font = Enum.Font.Gotham
-    info.TextSize = 14
-    info.Text = "Get key at:\n" .. keyLink .. "\nPassword for archive: Ztag.inf"
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1, -20, 0, 40)
+title.Position = UDim2.new(0, 10, 0, 10)
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.new(1,1,1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
+title.Text = "Enter Key to Use Script"
 
-    -- Кнопка для копирования ссылки
-    local copyLinkButton = Instance.new("TextButton", frame)
-    copyLinkButton.Size = UDim2.new(0, 120, 0, 30)
-    copyLinkButton.Position = UDim2.new(0, 10, 0, 108)
-    copyLinkButton.Text = "Copy Key Link"
-    copyLinkButton.Font = Enum.Font.Gotham
-    copyLinkButton.TextSize = 14
-    copyLinkButton.TextColor3 = Color3.new(1,1,1)
-    copyLinkButton.BackgroundColor3 = Color3.fromRGB(70,130,180)
-    Instance.new("UICorner", copyLinkButton)
+-- TextBox для ключа
+local inputBox = Instance.new("TextBox", frame)
+inputBox.Size = UDim2.new(1, -140, 0, 32)
+inputBox.Position = UDim2.new(0, 140, 0, 108)
+inputBox.PlaceholderText = "Enter key here"
+inputBox.ClearTextOnFocus = false
+inputBox.Text = ""
+inputBox.Font = Enum.Font.Gotham
+inputBox.TextSize = 18
+inputBox.TextColor3 = Color3.new(1,1,1)
+inputBox.BackgroundColor3 = Color3.fromRGB(45,45,45)
+Instance.new("UICorner", inputBox)
 
-    local inputBox = Instance.new("TextBox", frame)
-    inputBox.Size = UDim2.new(1, -140, 0, 32)
-    inputBox.Position = UDim2.new(0, 140, 0, 108)
-    inputBox.PlaceholderText = "Enter key here"
-    inputBox.ClearTextOnFocus = false
-    inputBox.Text = ""
-    inputBox.Font = Enum.Font.Gotham
-    inputBox.TextSize = 18
-    inputBox.TextColor3 = Color3.new(1,1,1)
-    inputBox.BackgroundColor3 = Color3.fromRGB(45,45,45)
-    Instance.new("UICorner", inputBox)
+-- Кнопка Submit
+local submit = Instance.new("TextButton", frame)
+submit.Size = UDim2.new(0, 90, 0, 32)
+submit.Position = UDim2.new(1, -100, 0, 108)
+submit.Text = "Submit"
+submit.Font = Enum.Font.GothamBold
+submit.TextSize = 18
+submit.TextColor3 = Color3.new(1,1,1)
+submit.BackgroundColor3 = Color3.fromRGB(70,130,180)
+Instance.new("UICorner", submit)
 
-    local submit = Instance.new("TextButton", frame)
-    submit.Size = UDim2.new(0, 90, 0, 32)
-    submit.Position = UDim2.new(1, -100, 0, 108)
-    submit.Text = "Submit"
-    submit.Font = Enum.Font.GothamBold
-    submit.TextSize = 18
-    submit.TextColor3 = Color3.new(1,1,1)
-    submit.BackgroundColor3 = Color3.fromRGB(70,130,180)
-    Instance.new("UICorner", submit)
+-- Кнопка копирования ссылки
+local copyLinkButton = Instance.new("TextButton", frame)
+copyLinkButton.Size = UDim2.new(0, 120, 0, 30)
+copyLinkButton.Position = UDim2.new(0, 10, 0, 108)
+copyLinkButton.Text = "Copy Key Link"
+copyLinkButton.Font = Enum.Font.Gotham
+copyLinkButton.TextSize = 14
+copyLinkButton.TextColor3 = Color3.new(1,1,1)
+copyLinkButton.BackgroundColor3 = Color3.fromRGB(70,130,180)
+Instance.new("UICorner", copyLinkButton)
+copyLinkButton.MouseButton1Click:Connect(function()
+    setclipboard(keyLink)
+end)
 
-    local status = Instance.new("TextLabel", frame)
-    status.Size = UDim2.new(1, -20, 0, 20)
-    status.Position = UDim2.new(0, 10, 0, 150)
-    status.BackgroundTransparency = 1
-    status.TextColor3 = Color3.fromRGB(200,200,200)
-    status.Font = Enum.Font.Gotham
-    status.TextSize = 13
-    status.Text = "Enter the key and press Submit."
+-- Статус и прогресс
+local status = Instance.new("TextLabel", frame)
+status.Size = UDim2.new(1, -20, 0, 20)
+status.Position = UDim2.new(0, 10, 0, 150)
+status.BackgroundTransparency = 1
+status.TextColor3 = Color3.fromRGB(200,200,200)
+status.Font = Enum.Font.Gotham
+status.TextSize = 13
+status.Text = "Enter key and press Submit."
 
-    local keyAccepted = false
+local progressBar = Instance.new("Frame", frame)
+progressBar.Size = UDim2.new(0,0,0,10)
+progressBar.Position = UDim2.new(0,10,0,180)
+progressBar.BackgroundColor3 = Color3.fromRGB(70,130,180)
+Instance.new("UICorner", progressBar)
 
-    local function checkKey(k)
-        if k == correctKey then
-            keyAccepted = true
-            screenGui:Destroy()
-            return true
-        else
-            status.Text = "Incorrect key. Get key at: " .. keyLink
-            inputBox.Text = ""
-            return false
+-- Проверка ключа
+local keyAccepted = false
+local function checkKey(k)
+    if k == correctKey then
+        keyAccepted = true
+        -- Анимация прогресса
+        for i = 0, 1, 0.01 do
+            progressBar.Size = UDim2.new(i,0,0,10)
+            status.Text = "Loading... "..math.floor(i*100).."%"
+            task.wait(0.02)
         end
+        screenGui:Destroy()
+        return true
+    else
+        status.Text = "Incorrect key."
+        inputBox.Text = ""
+        return false
     end
-
-    copyLinkButton.MouseButton1Click:Connect(function()
-        setclipboard(keyLink)
-        status.Text = "Key link copied to clipboard!"
-    end)
-
-    submit.MouseButton1Click:Connect(function()
-        checkKey(inputBox.Text)
-    end)
-
-    inputBox.FocusLost:Connect(function(enterPressed)
-        if enterPressed then
-            checkKey(inputBox.Text)
-        end
-    end)
-
-    repeat task.wait() until keyAccepted
 end
 
-requestKey()
+submit.MouseButton1Click:Connect(function()
+    checkKey(inputBox.Text)
+end)
 
--- Load Rayfield
+inputBox.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        checkKey(inputBox.Text)
+    end
+end)
+
+repeat task.wait() until keyAccepted
+
+-- ======= Основной скрипт Phonk RNG после загрузки =======
 local Rayfield = nil
 local ok, err = pcall(function()
     Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield', true))()
@@ -157,7 +164,7 @@ local TabFun = Window:CreateTab("Fun", 4483362458)
 local TabCopy = Window:CreateTab("Copy Aura", 4483362458)
 local TabMusic = Window:CreateTab("Aura Music", 4483362458)
 
--- Functions
+-- ======= Функции =======
 local function ResetAuras()
     for _, toggle in pairs(AuraToggles) do
         if toggle and toggle.Set then toggle:Set(false) end
